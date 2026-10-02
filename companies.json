@@ -1,0 +1,39 @@
+{
+  "_note": "Official email/web domains of companies that commonly hire freshers in India. Extend this list as you verify more companies.",
+  "companies": {
+    "tcs": {"name": "Tata Consultancy Services", "domains": ["tcs.com"]},
+    "infosys": {"name": "Infosys", "domains": ["infosys.com"]},
+    "wipro": {"name": "Wipro", "domains": ["wipro.com"]},
+    "hcl": {"name": "HCLTech", "domains": ["hcltech.com", "hcl.com"]},
+    "tech mahindra": {"name": "Tech Mahindra", "domains": ["techmahindra.com"]},
+    "accenture": {"name": "Accenture", "domains": ["accenture.com"]},
+    "cognizant": {"name": "Cognizant", "domains": ["cognizant.com"]},
+    "capgemini": {"name": "Capgemini", "domains": ["capgemini.com"]},
+    "deloitte": {"name": "Deloitte", "domains": ["deloitte.com"]},
+    "ibm": {"name": "IBM", "domains": ["ibm.com"]},
+    "amazon": {"name": "Amazon", "domains": ["amazon.com", "amazon.in", "amazon.jobs"]},
+    "google": {"name": "Google", "domains": ["google.com"]},
+    "microsoft": {"name": "Microsoft", "domains": ["microsoft.com"]},
+    "flipkart": {"name": "Flipkart", "domains": ["flipkart.com"]},
+    "paytm": {"name": "Paytm", "domains": ["paytm.com"]},
+    "zomato": {"name": "Zomato", "domains": ["zomato.com"]},
+    "swiggy": {"name": "Swiggy", "domains": ["swiggy.in"]},
+    "oracle": {"name": "Oracle", "domains": ["oracle.com"]},
+    "adobe": {"name": "Adobe", "domains": ["adobe.com"]},
+    "zoho": {"name": "Zoho", "domains": ["zohocorp.com", "zoho.com"]},
+    "ltimindtree": {"name": "LTIMindtree", "domains": ["ltimindtree.com"]},
+    "genpact": {"name": "Genpact", "domains": ["genpact.com"]}
+  },
+  "free_email_providers": [
+    "gmail.com", "yahoo.com", "yahoo.in", "yahoo.co.in", "outlook.com", "hotmail.com",
+    "rediffmail.com", "ymail.com", "protonmail.com", "proton.me", "aol.com", "icloud.com",
+    "mail.com", "gmx.com", "zoho.in"
+  ],
+  "suspicious_tlds": [
+    "xyz", "top", "online", "site", "club", "info", "live", "work", "click", "link",
+    "buzz", "icu", "shop", "rest", "fun", "space", "website", "tk", "ml", "ga", "cf", "gq"
+  ],
+  "url_shorteners": [
+    "bit.ly", "tinyurl.com", "t.co", "goo.gl", "cutt.ly", "rb.gy", "shorturl.at", "is.gd", "tiny.cc"
+  ]
+}

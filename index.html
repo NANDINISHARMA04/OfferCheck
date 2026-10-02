@@ -1,0 +1,581 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F6F5FB" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#15111D" media="(prefers-color-scheme: dark)">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Offer Check">
+<link rel="manifest" href="/static/manifest.webmanifest">
+<link rel="icon" href="/static/icons/icon-192.png">
+<link rel="apple-touch-icon" href="/static/icons/apple-touch-icon.png">
+<title>Offer Check</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700&family=Manrope:wght@400;500;700&family=Hind:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root {
+  --page: #F6F5FB; --card: #FFFFFF; --ink: #1B1530; --muted: #6E6888; --line: #E7E4F0;
+  --field: #F3F1F9; --glass: rgba(255,255,255,.72);
+  --lav: #B9B4FF; --pink: #F6B8E4; --butter: #FFE08A; --mint: #A8E6D8;
+  --scam: #D6334D; --warn: #A86A00; --safe: #1F8A5B; --focus: #6B5CFF;
+  --display: "Unbounded", "Hind", "Arial Black", system-ui, sans-serif;
+  --body: "Manrope", "Hind", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --r-xl: 32px; --r-lg: 24px; --r-pill: 999px;
+}
+@media (prefers-color-scheme: dark) {
+  :root { --page: #15111D; --card: #221B2E; --ink: #F4F1FA; --muted: #A49CB8; --line: #342B44;
+          --field: #2B2339; --glass: rgba(34,27,46,.72); --scam: #FF7A8F; --warn: #F2B84B; --safe: #6FD3A4; --focus: #A79CFF; }
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body { margin: 0; background: var(--page); color: var(--ink); font: 16px/1.55 var(--body); }
+html[lang=hi] body { font-family: "Hind", var(--body); }
+button, input, textarea, select { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--focus); outline-offset: 3px; }
+.hidden { display: none !important; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+
+.app { max-width: 480px; margin: 0 auto; min-height: 100vh;
+  padding: calc(env(safe-area-inset-top) + 16px) 18px calc(env(safe-area-inset-bottom) + 120px); position: relative; overflow-x: clip; }
+
+/* Top bar */
+.top { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 700; }
+.brand img { width: 36px; height: 36px; border-radius: 11px; }
+.lang { display: flex; background: var(--card); border: 1px solid var(--line); border-radius: var(--r-pill); padding: 4px; }
+.lang button { border: 0; background: none; padding: 6px 12px; border-radius: var(--r-pill); cursor: pointer; font-weight: 600; font-size: .9rem; color: var(--muted); }
+.lang button[aria-pressed=true] { background: var(--ink); color: var(--page); }
+
+/* Home */
+.hero { position: relative; margin: 28px 0 22px; }
+.hero::before { content: ""; position: absolute; right: -30px; top: -40px; width: 190px; height: 190px; z-index: 0;
+  background: radial-gradient(circle at 35% 35%, var(--lav), transparent 60%),
+              radial-gradient(circle at 70% 60%, var(--pink), transparent 58%),
+              radial-gradient(circle at 40% 80%, var(--butter), transparent 55%);
+  filter: blur(6px); opacity: .85; border-radius: 50%; }
+@media (prefers-color-scheme: dark) { .hero::before { opacity: .45; } }
+.hello { position: relative; color: var(--muted); margin: 0 0 6px; font-weight: 500; }
+h1 { position: relative; font: 700 clamp(2rem, 9vw, 2.6rem)/1.08 var(--display); letter-spacing: -.02em; margin: 0; }
+html[lang=hi] h1 { font-family: "Hind", var(--display); font-weight: 600; line-height: 1.2; }
+
+.box { position: relative; z-index: 1; background: var(--card); border-radius: var(--r-xl); padding: 8px; border: 1px solid var(--line); }
+.box textarea { display: block; width: 100%; min-height: 240px; border: 0; background: transparent; resize: vertical;
+  padding: 16px 16px 8px; font-size: 1rem; line-height: 1.5; }
+.box textarea:focus-visible { outline: none; }
+.box:focus-within { border-color: var(--focus); box-shadow: 0 0 0 3px color-mix(in srgb, var(--focus) 18%, transparent); }
+.box-actions { display: flex; gap: 8px; padding: 8px; flex-wrap: wrap; align-items: center; }
+.chip { display: inline-flex; align-items: center; gap: 8px; border: 0; background: var(--field); border-radius: var(--r-pill);
+  padding: 9px 14px; cursor: pointer; font-weight: 600; font-size: .9rem; }
+.chip svg { width: 18px; height: 18px; }
+.file-chip { background: var(--lav); color: #1B1530; }
+.file-chip .x { border: 0; background: rgba(27,21,48,.12); width: 22px; height: 22px; border-radius: 50%; cursor: pointer; line-height: 1; }
+.count { margin-left: auto; color: var(--muted); font-size: .82rem; padding-right: 6px; }
+
+.field { margin-top: 12px; }
+.field label { display: block; font-weight: 600; font-size: .9rem; margin: 0 0 6px 16px; color: var(--muted); }
+.field input { width: 100%; border: 1px solid var(--line); background: var(--card); border-radius: var(--r-pill); padding: 14px 20px; }
+.switch { display: flex; align-items: center; gap: 12px; margin: 14px 4px 0; color: var(--muted); font-size: .92rem; cursor: pointer; }
+.switch input { appearance: none; width: 44px; height: 26px; border-radius: 13px; background: var(--line); position: relative; flex: none; cursor: pointer; transition: background .2s; }
+.switch input::after { content: ""; position: absolute; top: 3px; left: 3px; width: 20px; height: 20px; border-radius: 50%; background: #fff; transition: transform .2s; }
+.switch input:checked { background: var(--ink); }
+.switch input:checked::after { transform: translateX(18px); }
+
+.go { margin-top: 20px; width: 100%; display: flex; align-items: center; justify-content: space-between; border: 0; cursor: pointer;
+  background: var(--ink); color: var(--page); border-radius: var(--r-pill); padding: 8px 8px 8px 26px; font-weight: 700; font-size: 1.05rem; }
+.go .arrow { width: 52px; height: 52px; border-radius: 50%; background: var(--page); color: var(--ink); display: grid; place-items: center; }
+.go .arrow svg { width: 22px; height: 22px; }
+.go:disabled { opacity: .7; cursor: wait; }
+.go.loading .arrow svg { animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.error { color: var(--scam); font-weight: 600; margin: 12px 8px 0; }
+
+/* Result */
+.back { margin-top: 18px; width: 46px; height: 46px; border-radius: 50%; border: 1px solid var(--line); background: var(--card); display: grid; place-items: center; cursor: pointer; }
+.back svg { width: 20px; height: 20px; }
+.verdict-card { --base: #CFF3E8; --b1: var(--mint); --b2: var(--lav); --b3: #E8FFF6;
+  margin-top: 18px; border-radius: var(--r-xl); padding: 26px 24px 24px; color: #1B1530; position: relative; overflow: hidden;
+  background:
+    radial-gradient(120% 90% at 110% -10%, var(--b2) 0 35%, transparent 60%),
+    radial-gradient(90% 80% at -20% 110%, var(--b1) 0 30%, transparent 62%),
+    radial-gradient(70% 60% at 85% 95%, var(--b3) 0 20%, transparent 60%), var(--base); }
+.verdict-card.warn { --base: #FFF1C2; --b1: var(--butter); --b2: var(--pink); --b3: #FFE7B0; }
+.verdict-card.scam { --base: #FFD9E6; --b1: #FF9DB5; --b2: var(--lav); --b3: var(--pink); }
+.vc-top { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.tag { display: inline-block; background: rgba(255,255,255,.65); border-radius: var(--r-pill); padding: 5px 12px; font-size: .82rem; font-weight: 700; }
+.ring { width: 96px; height: 96px; position: relative; flex: none; }
+.ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+.ring .track { stroke: rgba(27,21,48,.12); }
+.ring .val { stroke: #1B1530; stroke-linecap: round; transition: stroke-dashoffset .9s cubic-bezier(.2,.8,.2,1); }
+.ring b { position: absolute; inset: 0; display: grid; place-items: center; font: 700 1.5rem var(--display); }
+.verdict { font: 700 clamp(1.7rem, 7.5vw, 2.1rem)/1.1 var(--display); margin: 18px 0 10px; letter-spacing: -.01em; }
+html[lang=hi] .verdict { font-family: "Hind", var(--display); font-weight: 600; line-height: 1.25; }
+.summary { margin: 0; font-size: .98rem; max-width: 40ch; }
+
+.section-title { font: 700 1.1rem var(--display); margin: 28px 4px 12px; }
+html[lang=hi] .section-title { font-family: "Hind", var(--display); font-weight: 600; }
+.reasons { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; }
+.reasons details { background: var(--card); border: 1px solid var(--line); border-radius: var(--r-lg); }
+.reasons summary { list-style: none; display: grid; grid-template-columns: 44px 1fr 32px; gap: 12px; align-items: center; padding: 12px 12px 12px 14px; cursor: pointer; font-weight: 600; }
+.reasons summary::-webkit-details-marker { display: none; }
+.pts { width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; font-weight: 700; font-size: .85rem; color: #1B1530; }
+.pts.up { background: var(--pink); } .pts.down { background: var(--mint); }
+.chev { width: 32px; height: 32px; border-radius: 50%; background: var(--field); display: grid; place-items: center; transition: transform .25s; }
+.chev svg { width: 14px; height: 14px; }
+details[open] .chev { transform: rotate(90deg); }
+.reason-body { padding: 0 16px 16px 70px; color: var(--muted); font-size: .94rem; }
+.reason-body p { margin: 0; }
+.ev { display: block; margin-top: 8px; background: var(--field); border-radius: 12px; padding: 8px 12px; font-size: .85rem; color: var(--ink); word-break: break-word; }
+
+.help { margin-top: 18px; background: var(--card); border: 1px solid var(--line); border-radius: var(--r-lg); padding: 16px 18px; font-size: .93rem; }
+.help a { color: var(--ink); font-weight: 700; }
+.row { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
+.btn2 { flex: 1; min-width: 140px; border: 1.5px solid var(--ink); background: none; border-radius: var(--r-pill); padding: 13px 16px; font-weight: 700; cursor: pointer; }
+.btn2.solid { background: var(--ink); color: var(--page); }
+
+/* History */
+.page-title { font: 700 1.8rem/1.1 var(--display); margin: 28px 4px 18px; letter-spacing: -.01em; }
+html[lang=hi] .page-title { font-family: "Hind", var(--display); font-weight: 600; }
+.hist { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
+.hist button { width: 100%; text-align: left; border: 1px solid var(--line); background: var(--card); border-radius: var(--r-lg); padding: 14px; cursor: pointer;
+  display: grid; grid-template-columns: 48px minmax(0, 1fr); gap: 14px; align-items: center; }
+.hist button > span:last-child { min-width: 0; }
+.dot { width: 48px; height: 48px; border-radius: 16px; display: grid; place-items: center; font-weight: 700; color: #1B1530; }
+.dot.safe { background: var(--mint); } .dot.warn { background: var(--butter); } .dot.scam { background: var(--pink); }
+.hist strong { display: block; }
+.hist span.snip { display: block; color: var(--muted); font-size: .88rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.empty { text-align: center; color: var(--muted); padding: 48px 20px; background: var(--card); border: 1px dashed var(--line); border-radius: var(--r-xl); }
+.link-btn { border: 0; background: none; color: var(--muted); text-decoration: underline; cursor: pointer; margin: 16px auto 0; display: block; }
+
+/* Report */
+.seg { display: flex; background: var(--field); border-radius: var(--r-pill); padding: 4px; margin-bottom: 4px; }
+.seg button { flex: 1; border: 0; background: none; padding: 10px; border-radius: var(--r-pill); font-weight: 600; cursor: pointer; color: var(--muted); }
+.seg button[aria-pressed=true] { background: var(--card); color: var(--ink); box-shadow: 0 1px 3px rgba(27,21,48,.12); }
+.ok { color: var(--safe); font-weight: 600; margin: 12px 8px 0; }
+.stats { margin-top: 24px; display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.stat { border-radius: var(--r-lg); padding: 14px; color: #1B1530; }
+.stat:nth-child(1) { background: var(--lav); } .stat:nth-child(2) { background: var(--pink); } .stat:nth-child(3) { background: var(--butter); }
+.stat b { display: block; font: 700 1.4rem var(--display); }
+.stat span { font-size: .8rem; font-weight: 600; }
+
+/* Floating glass nav, like the inspiration */
+nav.dock { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(env(safe-area-inset-bottom) + 16px); z-index: 10;
+  display: flex; gap: 6px; padding: 7px; border-radius: var(--r-pill); background: var(--glass);
+  -webkit-backdrop-filter: blur(18px) saturate(1.6); backdrop-filter: blur(18px) saturate(1.6);
+  border: 1px solid var(--line); box-shadow: 0 10px 30px rgba(27,21,48,.14); }
+nav.dock button { width: 58px; height: 58px; border-radius: 50%; border: 0; background: none; display: grid; place-items: center; cursor: pointer; color: var(--ink); }
+nav.dock button svg { width: 22px; height: 22px; }
+nav.dock button[aria-current=page] { background: var(--ink); color: var(--page); }
+
+@media (prefers-reduced-motion: no-preference) {
+  .verdict-card.pop { animation: rise .45s cubic-bezier(.2,.9,.3,1.15); }
+  @keyframes rise { from { transform: translateY(18px) scale(.97); opacity: 0; } to { transform: none; opacity: 1; } }
+}
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } }
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="brand"><img src="/static/icons/icon-192.png" alt=""> Offer Check</div>
+    <div class="lang" role="group" aria-label="Language">
+      <button data-lang="en" aria-pressed="true">EN</button>
+      <button data-lang="hi" aria-pressed="false">हिं</button>
+    </div>
+  </header>
+
+  <!-- CHECK -->
+  <main id="v-check">
+    <div class="hero">
+      <p class="hello" data-i="hello"></p>
+      <h1 data-i="headline"></h1>
+    </div>
+
+    <div class="box">
+      <label for="text" class="sr" data-i="pasteLabel"></label>
+      <textarea id="text" data-ip="pastePh" maxlength="20000"></textarea>
+      <div class="box-actions">
+        <button class="chip" id="pasteBtn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="8" y="3" width="8" height="4" rx="1"/><path d="M16 5h2a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h2"/></svg>
+          <span data-i="paste"></span></button>
+        <button class="chip" id="fileBtn" type="button">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="3" y="4" width="18" height="16" rx="3"/><circle cx="9" cy="10" r="2"/><path d="m21 16-5-5-9 9"/></svg>
+          <span data-i="upload"></span></button>
+        <span class="chip file-chip hidden" id="fileChip"><span id="fileName"></span><button class="x" id="fileX" type="button" aria-label="Remove file">×</button></span>
+        <span class="count" id="count"></span>
+        <input id="file" type="file" accept="image/*,.pdf,.txt" class="hidden">
+      </div>
+    </div>
+
+    <div class="field">
+      <label for="sender" data-i="senderLabel"></label>
+      <input id="sender" type="email" inputmode="email" autocomplete="off" placeholder="hr@company.com">
+    </div>
+    <label class="switch"><input type="checkbox" id="age"><span data-i="ageLabel"></span></label>
+
+    <button class="go" id="go"><span data-i="check"></span>
+      <span class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button>
+    <p class="error" id="err" role="alert"></p>
+  </main>
+
+  <!-- RESULT -->
+  <main id="v-result" class="hidden" aria-live="polite">
+    <button class="back" id="backBtn" aria-label="Back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M11 18l-6-6 6-6"/></svg></button>
+    <section class="verdict-card" id="vcard">
+      <div class="vc-top">
+        <span class="tag" data-i="riskTag"></span>
+        <div class="ring" aria-hidden="true">
+          <svg viewBox="0 0 100 100"><circle class="track" cx="50" cy="50" r="42" fill="none" stroke-width="9"/>
+            <circle class="val" id="ringVal" cx="50" cy="50" r="42" fill="none" stroke-width="9" stroke-dasharray="263.9" stroke-dashoffset="263.9"/></svg>
+          <b id="score">0</b>
+        </div>
+      </div>
+      <h2 class="verdict" id="verdict"></h2>
+      <p class="summary" id="summary"></p>
+    </section>
+
+    <h3 class="section-title" data-i="why"></h3>
+    <ul class="reasons" id="reasons"></ul>
+
+    <div class="help" data-ih="help"></div>
+    <div class="row">
+      <button class="btn2" id="reportThis" data-i="reportThis"></button>
+      <button class="btn2 solid" id="again" data-i="again"></button>
+    </div>
+  </main>
+
+  <!-- HISTORY -->
+  <main id="v-history" class="hidden">
+    <h2 class="page-title" data-i="historyTitle"></h2>
+    <ul class="hist" id="hist"></ul>
+    <button class="link-btn hidden" id="clearHist" data-i="clear"></button>
+  </main>
+
+  <!-- REPORT -->
+  <main id="v-report" class="hidden">
+    <h2 class="page-title" data-i="reportTitle"></h2>
+    <p style="margin:0 4px 18px;color:var(--muted)" data-i="reportIntro"></p>
+    <div class="seg" role="group">
+      <button data-kind="email" aria-pressed="true" data-i="email"></button>
+      <button data-kind="domain" aria-pressed="false" data-i="website"></button>
+    </div>
+    <div class="field"><label for="rvalue" data-i="rValueLabel"></label><input id="rvalue" type="text" autocomplete="off" placeholder="hr.infosys@gmail.com"></div>
+    <div class="field"><label for="rcompany" data-i="rCompanyLabel"></label><input id="rcompany" type="text" placeholder="Infosys"></div>
+    <button class="go" id="reportBtn"><span data-i="reportBtn"></span>
+      <span class="arrow"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span></button>
+    <p class="ok" id="rmsg" role="status"></p>
+    <div class="stats" id="stats"></div>
+  </main>
+</div>
+
+<nav class="dock" aria-label="Main">
+  <button data-view="check" aria-current="page" data-ia="navCheck"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6z"/><path d="m8.5 12 2.5 2.5 4.5-5"/></svg></button>
+  <button data-view="history" data-ia="navHistory"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7L3 8"/><path d="M3 3v5h5M12 7v5l3 3"/></svg></button>
+  <button data-view="report" data-ia="navReport"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 21V4M5 4h11l-2 4 2 4H5"/></svg></button>
+</nav>
+
+<script>
+/* ---------------- Text in both languages ---------------- */
+const I18N = {
+  en: {
+    hello: "Placement season tip: never pay for a job.",
+    headline: "Is this offer real?",
+    pasteLabel: "Offer message", pastePh: "Paste the offer email, letter or WhatsApp message here…",
+    paste: "Paste", upload: "Screenshot / PDF", chars: n => `${n} chars`,
+    senderLabel: "Sender's email (optional)", ageLabel: "Also check how old the website is",
+    check: "Check offer", checking: "Checking…",
+    needText: "Paste the offer message first, or add a screenshot.", offline: "Can't reach the server. Check your internet.",
+    clipFail: "Couldn't read the clipboard. Long-press the box and paste.",
+    riskTag: "Risk score", why: "Why we think so", noReasons: "No specific signals found either way.",
+    help: 'Never pay to get a job. If someone asked you for money, tell your placement cell and report it at <a href="https://cybercrime.gov.in" target="_blank" rel="noopener">cybercrime.gov.in</a> or call 1930.',
+    reportThis: "Report sender", again: "Check another",
+    historyTitle: "Your checks", historyEmpty: "Offers you check will show up here. They stay on this phone only.", clear: "Clear history",
+    reportTitle: "Warn other students", reportIntro: "Got a fake offer? Report the email or website so the next person gets warned.",
+    email: "Email", website: "Website", rValueLabel: "Email or website", rCompanyLabel: "Company it pretended to be",
+    reportBtn: "Report scam", reported: "Reported. Future checks will warn others.", needValue: "Enter the email or website.",
+    statChecked: "offers checked", statFlagged: "scams caught", statReports: "reports",
+    navCheck: "Check offer", navHistory: "History", navReport: "Report scam",
+    verdicts: { "Likely scam": "Likely scam", "Suspicious": "Suspicious", "No major red flags": "Looks okay" },
+  },
+  hi: {
+    hello: "प्लेसमेंट सीज़न टिप: नौकरी के लिए कभी पैसे न दें।",
+    headline: "क्या ये ऑफ़र असली है?",
+    pasteLabel: "ऑफ़र मैसेज", pastePh: "ऑफ़र ईमेल, लेटर या WhatsApp मैसेज यहाँ पेस्ट करें…",
+    paste: "पेस्ट करें", upload: "स्क्रीनशॉट / PDF", chars: n => `${n} अक्षर`,
+    senderLabel: "भेजने वाले का ईमेल (वैकल्पिक)", ageLabel: "वेबसाइट कितनी पुरानी है, यह भी जाँचें",
+    check: "ऑफ़र जाँचें", checking: "जाँच हो रही है…",
+    needText: "पहले ऑफ़र मैसेज पेस्ट करें, या स्क्रीनशॉट जोड़ें।", offline: "सर्वर से कनेक्ट नहीं हो पा रहा। इंटरनेट जाँचें।",
+    clipFail: "क्लिपबोर्ड नहीं पढ़ पाए। बॉक्स को देर तक दबाकर पेस्ट करें।",
+    riskTag: "रिस्क स्कोर", why: "हमें ऐसा क्यों लगता है", noReasons: "कोई खास संकेत नहीं मिला।",
+    help: 'नौकरी के लिए कभी पैसे न दें। अगर किसी ने पैसे माँगे हैं, तो प्लेसमेंट सेल को बताएँ और <a href="https://cybercrime.gov.in" target="_blank" rel="noopener">cybercrime.gov.in</a> पर रिपोर्ट करें या 1930 पर कॉल करें।',
+    reportThis: "भेजने वाले को रिपोर्ट करें", again: "दूसरा ऑफ़र जाँचें",
+    historyTitle: "आपकी जाँचें", historyEmpty: "आप जो ऑफ़र जाँचेंगे वे यहाँ दिखेंगे। ये सिर्फ़ इसी फ़ोन में रहते हैं।", clear: "हिस्ट्री मिटाएँ",
+    reportTitle: "दूसरे छात्रों को सावधान करें", reportIntro: "नकली ऑफ़र मिला? ईमेल या वेबसाइट रिपोर्ट करें ताकि अगले व्यक्ति को चेतावनी मिले।",
+    email: "ईमेल", website: "वेबसाइट", rValueLabel: "ईमेल या वेबसाइट", rCompanyLabel: "किस कंपनी के नाम से आया",
+    reportBtn: "स्कैम रिपोर्ट करें", reported: "रिपोर्ट हो गया। आगे की जाँचों में दूसरों को चेतावनी मिलेगी।", needValue: "ईमेल या वेबसाइट लिखें।",
+    statChecked: "ऑफ़र जाँचे गए", statFlagged: "स्कैम पकड़े", statReports: "रिपोर्ट",
+    navCheck: "ऑफ़र जाँचें", navHistory: "हिस्ट्री", navReport: "स्कैम रिपोर्ट",
+    verdicts: { "Likely scam": "शायद स्कैम है", "Suspicious": "संदिग्ध", "No major red flags": "ठीक लग रहा है" },
+  },
+};
+
+/* Hindi versions of each finding the server can return (matched by title). */
+const FINDINGS_HI = [
+  [/^Asks you to pay money$/, () => ["पैसे माँगे जा रहे हैं", "असली कंपनियाँ रजिस्ट्रेशन, ट्रेनिंग, लैपटॉप या वेरिफ़िकेशन के लिए कभी पैसे नहीं माँगतीं। यह सबसे आम स्कैम है।"]],
+  [/^Payment through UPI/, () => ["UPI / निजी खाते में भुगतान", "कंपनी के भुगतान कभी किसी निजी UPI ID या वॉलेट में नहीं जाते।"]],
+  [/^Pressure to act immediately$/, () => ["तुरंत फ़ैसला करने का दबाव", "स्कैमर जल्दबाज़ी कराते हैं ताकि आप जाँच न कर सकें।"]],
+  [/^Selected without a proper interview$/, () => ["बिना इंटरव्यू के सिलेक्शन", "असली फ्रेशर भर्ती में टेस्ट या इंटरव्यू ज़रूर होता है।"]],
+  [/^Communication moved to WhatsApp/, () => ["WhatsApp / Telegram पर बातचीत", "असली HR प्रक्रिया कंपनी ईमेल और पोर्टल पर होती है, चैट ऐप पर नहीं।"]],
+  [/^Task-based/, () => ["टास्क करके कमाई वाला काम", "'हर टास्क पर कमाई' वाले काम एक जाना-माना स्कैम है, जो अंत में पैसे जमा करवाता है।"]],
+  [/^Vague work-from-home/, () => ["अस्पष्ट वर्क-फ़्रॉम-होम कमाई", "आसान कमाई वाली घर बैठे नौकरियाँ अक्सर टास्क स्कैम की शुरुआत होती हैं।"]],
+  [/^Asks for sensitive documents/, () => ["OTP / PIN / बैंक जानकारी माँगी", "किसी भी कंपनी को आपका OTP, PIN या बैंक पासवर्ड नहीं चाहिए।"]],
+  [/^Guaranteed job promise$/, () => ["नौकरी की गारंटी", "पक्की नौकरी का वादा, खासकर फ़ीस के साथ, एक पुराना जाल है।"]],
+  [/^Mentions a formal assessment process$/, () => ["सही चयन प्रक्रिया का ज़िक्र", "टेस्ट और इंटरव्यू जैसी सामान्य प्रक्रिया बताई गई है।"]],
+  [/^Email domain belongs to (.+)$/, m => [`ईमेल ${m[1]} के आधिकारिक डोमेन से है`, "अच्छा संकेत है, फिर भी कंपनी की आधिकारिक करियर वेबसाइट पर पुष्टि करें।"]],
+  [/^Company offer sent from a free email account$/, () => ["कंपनी का ऑफ़र Gmail/Yahoo से आया", "बड़ी कंपनियाँ HR ईमेल हमेशा अपने डोमेन से भेजती हैं।"]],
+  [/^Lookalike company domain$/, () => ["कंपनी जैसा दिखने वाला नकली डोमेन", "ईमेल का डोमेन असली कंपनी जैसा दिखता है, लेकिन आधिकारिक नहीं है।"]],
+  [/^Sent from a free email account$/, () => ["फ़्री ईमेल अकाउंट से भेजा गया", "रजिस्टर्ड कंपनियों के रिक्रूटर आमतौर पर कंपनी ईमेल से लिखते हैं।"]],
+  [/^Shortened link/, () => ["छोटा लिंक असली वेबसाइट छुपाता है", "खोलने से पहले लिंक की असली वेबसाइट जाँच लें।"]],
+  [/^Link points to a raw IP/, () => ["लिंक IP एड्रेस पर जाता है", "असली करियर पोर्टल डोमेन नाम इस्तेमाल करते हैं।"]],
+  [/^Uses a cheap (\.\w+) domain$/, m => [`सस्ता ${m[1]} डोमेन`, `${m[1]} डोमेन सस्ते होते हैं और स्कैम में बहुत इस्तेमाल होते हैं।`]],
+  [/^Website is not secure/, () => ["वेबसाइट सुरक्षित नहीं है (http)", "निजी जानकारी माँगने वाले फ़ॉर्म https पर होने चाहिए।"]],
+  [/^Lookalike careers website$/, () => ["नकली करियर वेबसाइट", "वेबसाइट असली कंपनी जैसी दिखती है, लेकिन उनकी आधिकारिक साइट नहीं है।"]],
+  [/^Website was created very recently$/, () => ["वेबसाइट हाल ही में बनी है", "नई बनी वेबसाइट स्कैम का बड़ा संकेत है।"]],
+  [/^Pays per day or week$/, () => ["रोज़ाना या हफ़्ते का भुगतान", "टेक नौकरियों में सैलरी महीने में मिलती है। रोज़ का भुगतान टास्क स्कैम में होता है।"]],
+  [/^Salary is unrealistically high$/, () => ["सैलरी अविश्वसनीय रूप से ज़्यादा", "फ्रेशर के लिए इतनी सैलरी, वो भी अनजान भेजने वाले से, आमतौर पर धोखा होती है।"]],
+  [/^Salary is higher than typical$/, () => ["सैलरी सामान्य से ज़्यादा", "बड़ी कंपनियों में संभव है, पर आधिकारिक पोर्टल पर पुष्टि करें।"]],
+  [/^Reported as a scam by other students$/, () => ["दूसरे छात्रों ने स्कैम रिपोर्ट किया है", "यह ईमेल या वेबसाइट पहले नकली ऑफ़र के लिए रिपोर्ट हो चुकी है।"]],
+];
+
+/* ---------------- State ---------------- */
+const $ = id => document.getElementById(id);
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v === null ? d : JSON.parse(v); } catch { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch {} },
+};
+let lang = store.get("lang", (navigator.language || "").startsWith("hi") ? "hi" : "en");
+let current = null;      // the result being shown
+let pendingFile = null;  // screenshot / PDF chosen
+let reportKind = "email";
+const t = k => I18N[lang][k];
+
+/* ---------------- Language ---------------- */
+function applyLang() {
+  document.documentElement.lang = lang;
+  document.querySelectorAll("[data-i]").forEach(el => { el.textContent = t(el.dataset.i); });
+  document.querySelectorAll("[data-ih]").forEach(el => { el.innerHTML = t(el.dataset.ih); });
+  document.querySelectorAll("[data-ip]").forEach(el => { el.placeholder = t(el.dataset.ip); });
+  document.querySelectorAll("[data-ia]").forEach(el => { el.setAttribute("aria-label", t(el.dataset.ia)); });
+  document.querySelectorAll(".lang button").forEach(b => b.setAttribute("aria-pressed", b.dataset.lang === lang));
+  updateCount();
+  if (current) renderResult(current, false);
+  renderHistory();
+  loadStats();
+}
+document.querySelectorAll(".lang button").forEach(b => b.addEventListener("click", () => {
+  lang = b.dataset.lang; store.set("lang", lang); applyLang();
+}));
+
+/* ---------------- Navigation ---------------- */
+function go(view) {
+  ["check", "result", "history", "report"].forEach(v => $("v-" + v).classList.toggle("hidden", v !== view));
+  const navView = view === "result" ? "check" : view;
+  document.querySelectorAll("nav.dock button").forEach(b =>
+    b.dataset.view === navView ? b.setAttribute("aria-current", "page") : b.removeAttribute("aria-current"));
+  window.scrollTo({ top: 0 });
+}
+document.querySelectorAll("nav.dock button").forEach(b => b.addEventListener("click", () => go(b.dataset.view)));
+$("backBtn").addEventListener("click", () => go("check"));
+$("again").addEventListener("click", () => { $("text").value = ""; clearFile(); updateCount(); go("check"); $("text").focus(); });
+
+/* ---------------- Input ---------------- */
+function updateCount() { const n = $("text").value.length; $("count").textContent = n ? t("chars")(n) : ""; }
+$("text").addEventListener("input", updateCount);
+$("pasteBtn").addEventListener("click", async () => {
+  try { $("text").value = await navigator.clipboard.readText(); updateCount(); }
+  catch { $("err").textContent = t("clipFail"); }
+});
+$("fileBtn").addEventListener("click", () => $("file").click());
+$("file").addEventListener("change", () => { if ($("file").files[0]) setFile($("file").files[0]); });
+$("fileX").addEventListener("click", clearFile);
+function setFile(f) { pendingFile = f; $("fileName").textContent = f.name || "shared file"; $("fileChip").classList.remove("hidden"); }
+function clearFile() { pendingFile = null; $("file").value = ""; $("fileChip").classList.add("hidden"); }
+
+/* ---------------- Check ---------------- */
+async function serverError(res) {
+  try { const j = await res.json(); return typeof j.detail === "string" ? j.detail : null; } catch { return null; }
+}
+$("go").addEventListener("click", runCheck);
+async function runCheck() {
+  $("err").textContent = "";
+  const text = $("text").value.trim();
+  const sender = $("sender").value.trim() || null;
+  const age = $("age").checked;
+  if (!pendingFile && text.length < 10) { $("err").textContent = t("needText"); return; }
+
+  const btn = $("go"); btn.disabled = true; btn.classList.add("loading");
+  btn.querySelector("span").textContent = t("checking");
+  try {
+    let res;
+    if (pendingFile) {
+      const fd = new FormData(); fd.append("file", pendingFile, pendingFile.name || "shared");
+      if (sender) fd.append("sender", sender); fd.append("check_domain_age", age);
+      res = await fetch("/api/analyze-file", { method: "POST", body: fd });
+    } else {
+      res = await fetch("/api/analyze", { method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ text, sender, check_domain_age: age }) });
+    }
+    if (!res.ok) { $("err").textContent = (await serverError(res)) || t("offline"); return; }
+    const r = await res.json();
+    r._snippet = (text || r.extracted_text || pendingFile?.name || "").replace(/\s+/g, " ").slice(0, 90);
+    r._sender = sender;
+    saveHistory(r);
+    renderResult(r, true);
+    go("result");
+  } catch { $("err").textContent = t("offline"); }
+  finally { btn.disabled = false; btn.classList.remove("loading"); btn.querySelector("span").textContent = t("check"); }
+}
+
+/* ---------------- Result ---------------- */
+const level = s => s >= 60 ? "scam" : s >= 25 ? "warn" : "safe";
+
+function localize(f) {
+  if (lang !== "hi") return [f.title, f.detail];
+  for (const [re, fn] of FINDINGS_HI) { const m = f.title.match(re); if (m) return fn(m); }
+  return [f.title, f.detail];   // AI findings stay in English
+}
+
+function hindiSummary(r) {
+  const risky = r.findings.filter(f => f.weight > 0).slice(0, 3).map(f => localize(f)[0]);
+  if (!risky.length) return "आम स्कैम संकेत नहीं मिले। फिर भी कोई दस्तावेज़ भेजने से पहले कंपनी की आधिकारिक वेबसाइट या प्लेसमेंट सेल से पुष्टि करें।";
+  if (r.risk_score >= 60) return `इस ऑफ़र में स्कैम के मज़बूत संकेत हैं: ${risky.join(", ")}। कोई पैसा न भेजें और दस्तावेज़ शेयर न करें।`;
+  return `कुछ चेतावनी संकेत मिले: ${risky.join(", ")}। जवाब देने से पहले कंपनी की आधिकारिक वेबसाइट से पुष्टि करें।`;
+}
+
+function renderResult(r, animate) {
+  current = r;
+  const card = $("vcard");
+  card.className = "verdict-card " + level(r.risk_score);
+  if (animate) { void card.offsetWidth; card.classList.add("pop"); }
+  $("verdict").textContent = t("verdicts")[r.verdict] || r.verdict;
+  $("summary").textContent = lang === "hi" ? hindiSummary(r) : r.summary;
+  $("score").textContent = r.risk_score;
+  const ring = $("ringVal"), C = 263.9;
+  if (animate) { ring.style.transition = "none"; ring.style.strokeDashoffset = C; void ring.getBoundingClientRect(); ring.style.transition = ""; }
+  requestAnimationFrame(() => { ring.style.strokeDashoffset = C * (1 - r.risk_score / 100); });
+
+  const ul = $("reasons"); ul.innerHTML = "";
+  if (!r.findings.length) { const li = document.createElement("li"); li.className = "help"; li.textContent = t("noReasons"); ul.append(li); }
+  r.findings.forEach(f => {
+    const [title, detail] = localize(f);
+    const li = document.createElement("li");
+    const d = document.createElement("details");
+    const s = document.createElement("summary");
+    const pts = document.createElement("span");
+    pts.className = "pts " + (f.weight > 0 ? "up" : "down");
+    pts.textContent = (f.weight > 0 ? "+" : "") + f.weight;
+    const tt = document.createElement("span"); tt.textContent = title;
+    const chev = document.createElement("span"); chev.className = "chev";
+    chev.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></svg>';
+    s.append(pts, tt, chev);
+    const body = document.createElement("div"); body.className = "reason-body";
+    const p = document.createElement("p"); p.textContent = detail; body.append(p);
+    if (f.evidence) { const ev = document.createElement("span"); ev.className = "ev"; ev.textContent = f.evidence; body.append(ev); }
+    d.append(s, body); li.append(d); ul.append(li);
+  });
+}
+
+$("reportThis").addEventListener("click", () => {
+  const email = current?._sender || current?.extracted?.emails?.[0];
+  const link = current?.extracted?.links?.[0];
+  setKind(email ? "email" : "domain");
+  $("rvalue").value = email || link || "";
+  $("rcompany").value = current?.extracted?.companies_mentioned?.[0] || "";
+  $("rmsg").textContent = "";
+  go("report");
+});
+
+/* ---------------- History (stays on this phone) ---------------- */
+function saveHistory(r) {
+  const list = store.get("history", []);
+  list.unshift({ id: Date.now(), at: new Date().toISOString(), result: r });
+  store.set("history", list.slice(0, 30));
+  renderHistory();
+}
+function renderHistory() {
+  const list = store.get("history", []);
+  const ul = $("hist"); ul.innerHTML = "";
+  $("clearHist").classList.toggle("hidden", !list.length);
+  if (!list.length) { const li = document.createElement("li"); li.className = "empty"; li.textContent = t("historyEmpty"); ul.append(li); return; }
+  const fmt = new Intl.DateTimeFormat(lang === "hi" ? "hi-IN" : "en-IN", { day: "numeric", month: "short", hour: "numeric", minute: "2-digit" });
+  list.forEach(item => {
+    const r = item.result;
+    const li = document.createElement("li"); const b = document.createElement("button");
+    const dot = document.createElement("span"); dot.className = "dot " + level(r.risk_score); dot.textContent = r.risk_score;
+    const info = document.createElement("span");
+    const st = document.createElement("strong"); st.textContent = t("verdicts")[r.verdict] || r.verdict;
+    const when = document.createElement("span"); when.className = "snip"; when.textContent = fmt.format(new Date(item.at));
+    const sn = document.createElement("span"); sn.className = "snip"; sn.textContent = r._snippet || "";
+    info.append(st, sn, when); b.append(dot, info);
+    b.addEventListener("click", () => { renderResult(r, true); go("result"); });
+    li.append(b); ul.append(li);
+  });
+}
+$("clearHist").addEventListener("click", () => { store.set("history", []); renderHistory(); });
+
+/* ---------------- Report ---------------- */
+function setKind(k) { reportKind = k; document.querySelectorAll(".seg button").forEach(b => b.setAttribute("aria-pressed", b.dataset.kind === k)); }
+document.querySelectorAll(".seg button").forEach(b => b.addEventListener("click", () => setKind(b.dataset.kind)));
+$("reportBtn").addEventListener("click", async () => {
+  $("rmsg").textContent = ""; $("rmsg").style.color = "";
+  const value = $("rvalue").value.trim();
+  if (value.length < 3) { $("rmsg").style.color = "var(--scam)"; $("rmsg").textContent = t("needValue"); return; }
+  try {
+    const res = await fetch("/api/reports", { method: "POST", headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ kind: reportKind, value, company_claimed: $("rcompany").value.trim() || null }) });
+    if (!res.ok) { $("rmsg").style.color = "var(--scam)"; $("rmsg").textContent = (await serverError(res)) || t("offline"); return; }
+    $("rmsg").textContent = t("reported"); $("rvalue").value = ""; $("rcompany").value = ""; loadStats();
+  } catch { $("rmsg").style.color = "var(--scam)"; $("rmsg").textContent = t("offline"); }
+});
+async function loadStats() {
+  try {
+    const s = await (await fetch("/api/stats")).json();
+    $("stats").innerHTML = "";
+    [[s.offers_checked, t("statChecked")], [s.scams_flagged, t("statFlagged")], [s.community_reports, t("statReports")]].forEach(([n, l]) => {
+      const d = document.createElement("div"); d.className = "stat";
+      const b = document.createElement("b"); b.textContent = n; const sp = document.createElement("span"); sp.textContent = l;
+      d.append(b, sp); $("stats").append(d);
+    });
+  } catch {}
+}
+
+/* ---------------- Shared from another app ---------------- */
+async function receiveShare() {
+  const params = new URLSearchParams(location.search);
+  if (params.has("text")) { $("text").value = params.get("text"); }
+  if (params.get("shared") === "1" && "caches" in window) {
+    try {
+      const cache = await caches.open("offercheck-share");
+      const textRes = await cache.match("/shared/text");
+      if (textRes) $("text").value = await textRes.text();
+      const fileRes = await cache.match("/shared/file");
+      if (fileRes) {
+        const blob = await fileRes.blob();
+        const name = decodeURIComponent(fileRes.headers.get("X-Filename") || "shared");
+        setFile(new File([blob], name, { type: blob.type }));
+      }
+      await cache.delete("/shared/text"); await cache.delete("/shared/file");
+    } catch {}
+  }
+  history.replaceState(null, "", "/");
+  updateCount();
+  if (pendingFile || $("text").value.trim().length >= 10) runCheck();
+}
+
+/* ---------------- Start ---------------- */
+applyLang();
+receiveShare();
+if ("serviceWorker" in navigator) navigator.serviceWorker.register("/sw.js").catch(() => {});
+</script>
+</body>
+</html>
